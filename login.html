@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 인증 - 한별농원</title>
+<style>
+    body { background: #1a0f08; color: #f5e6d3; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; }
+    .login-card { background: #25160d; padding: 40px; border-radius: 20px; width: 300px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #4a2c1a; background: #000; color: #fff; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #c8421a; color: #fff; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 style="color:#ff7675; margin-bottom:30px;">ADMIN LOGIN</h2>
+        <input type="text" id="uid" placeholder="관리자 아이디">
+        <input type="password" id="upw" placeholder="비밀번호">
+        <button onclick="doLogin()">로그인</button>
+    </div>
+    <script>
+        function doLogin() {
+            const id = document.getElementById('uid').value;
+            const pw = document.getElementById('upw').value;
+            if(id === 'admin' && pw === 'han190704!') {
+                location.href = 'onestar_admin.html';
+            } else {
+                alert('로그인 정보가 틀립니다.');
+            }
+        }
+    </script>
+</body>
+</html>
