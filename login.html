@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한별농원 관리자 - 로그인</title>
+    <style>
+        body { background-color: #2c1a0f; color: #f5e6d3; font-family: 'Pretendard', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-container { width: 100%; max-width: 350px; background-color: #1a0f08; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        .logo { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 30px; }
+        .logo span { color: #e67e22; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; color: #8b5e3c; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px; background-color: #000; border: 1px solid #4a2c1a; border-radius: 8px; color: #fff; box-sizing: border-box; }
+        .login-btn { width: 100%; padding: 12px; background: #d35400; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">한별농원 <span>관리자</span></div>
+        <div class="input-group">
+            <label>아이디</label>
+            <input type="text" id="id" placeholder="아이디를 입력하세요">
+        </div>
+        <div class="input-group">
+            <label>비밀번호</label>
+            <input type="password" id="pw" placeholder="비밀번호를 입력하세요">
+        </div>
+        <button class="login-btn" onclick="checkLogin()">로그인</button>
+    </div>
+    <script>
+        function checkLogin() {
+            const id = document.getElementById('id').value;
+            const pw = document.getElementById('pw').value;
+            if (id === 'admin' && pw === 'han190704!') {
+                location.href = 'onestar_admin.html';
+            } else {
+                alert('아이디 또는 비밀번호가 틀렸습니다.');
+            }
+        }
+    </script>
+</body>
+</html>
