@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한별농원 - ONESTAR FARM</title>
+    <style>
+        body { background-color: #2c1a0f; color: #f5e6d3; font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; text-align: center; }
+        .header { margin-bottom: 40px; }
+        .header h1 { color: #ff7675; font-size: 28px; }
+        .price-card { background: #1a0f08; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #3d2516; text-align: left; }
+        .price-title { font-size: 18px; color: #e67e22; margin-bottom: 10px; border-left: 4px solid #e67e22; padding-left: 10px; }
+        .price-row { display: flex; justify-content: space-between; margin: 8px 0; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+        .price-value { font-weight: bold; color: #fff; }
+        .admin-link { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: #3d2516; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 20px; opacity: 0.5; }
+        .admin-link:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <p>달콤한 햇살을 머금은</p>
+            <h1>🍎 한별농원</h1>
+        </div>
+
+        <div class="price-card">
+            <div class="price-title">사과 품종별 가격 정보</div>
+            <div class="price-row"><span>선물용 (15과 이내)</span><span class="price-value">120,000원</span></div>
+            <div class="price-row"><span>가정용 (16~20과)</span><span class="price-value">85,000원</span></div>
+            <div class="price-row"><span>실속형 (흠과)</span><span class="price-value">70,000원</span></div>
+        </div>
+
+        <div class="price-card">
+            <div class="price-title">한별농원 이야기</div>
+            <p style="font-size: 14px; color: #a38b7a; line-height: 1.6;">농원의 소식은 관리자가 노션을 통해 실시간으로 업데이트합니다.</p>
+        </div>
+    </div>
+
+    <a href="login.html" class="admin-link">⚙️</a>
+</body>
+</html>
