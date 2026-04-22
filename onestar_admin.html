@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한별농원 관리 시스템</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1a0e05; color: #f5e6d3; font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+.shell { max-width: 500px; margin: 0 auto; padding: 0 0 40px; }
+
+/* 헤더 */
+.admin-header {
+  background: #25160d;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid #4a2c1a;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.admin-brand { font-family: 'Noto Serif KR', serif; font-size: 15px; font-weight: 700; color: #f5e6d3; }
+.admin-brand span { color: #c8421a; }
+.header-btns { display: flex; gap: 8px; }
+.hbtn {
+  font-size: 11px; padding: 5px 12px; border-radius: 7px; cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif; border: 0.5px solid #4a2c1a;
+  color: #a07050; background: transparent; transition: all 0.15s;
+}
+.hbtn:hover { background: #3d2516; color: #f5e6d3; }
+.hbtn-red { background: #c8421a; color: #fff3ec; border-color: #c8421a; }
+.hbtn-red:hover { background: #a83210; }
+
+/* 탭 */
+.tabs { display: flex; background: #25160d; border-bottom: 0.5px solid #4a2c1a; }
+.tab {
+  flex: 1; padding: 12px 6px; text-align: center; font-size: 12px; font-weight: 500;
+  color: #5a3e28; cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.tab.act { color: #c8421a; border-bottom-color: #c8421a; }
+
+/* 섹션 */
+.section { padding: 16px 16px 0; }
+.sec-title {
+  font-size: 13px; font-weight: 600; color: #f5e6d3;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 7px;
+}
+.card {
+  background: #25160d; border-radius: 14px; padding: 14px;
+  margin-bottom: 12px; border: 0.5px solid #3d2516;
+}
+label { font-size: 11px; color: #8b5e3c; display: block; margin-bottom: 4px; margin-top: 10px; font-weight: 500; }
+label:first-child { margin-top: 0; }
+input, textarea, select {
+  width: 100%; padding: 10px 12px;
+  background: #1a0e05; border: 0.5px solid #4a2c1a;
+  color: #f5e6d3; border-radius: 9px;
+  font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+  outline: none; transition: border-color 0.15s;
+}
+input:focus, textarea:focus, select:focus { border-color: #c8421a; }
+input::placeholder, textarea::placeholder { color: #3d2516; }
+select option { background: #25160d; }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+
+/* 버튼 */
+.btn {
+  width: 100%; padding: 12px; border: none; border-radius: 10px;
+  font-weight: 600; cursor: pointer; margin-top: 12px;
+  font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
+  transition: background 0.15s; letter-spacing: 0.3px;
+}
+.btn-save { background: #c8421a; color: #fff3ec; }
+.btn-save:hover { background: #a83210; }
+.btn-notion { background: #1D9E75; color: #fff; }
+.btn-notion:hover { background: #0F6E56; }
+.btn-outline { background: transparent; border: 0.5px solid #4a2c1a; color: #a07050; margin-top: 8px; }
+.btn-outline:hover { background: #3d2516; color: #f5e6d3; }
+
+/* 상태 메시지 */
+.status-msg {
+  text-align: center; font-size: 12px; margin-top: 8px;
+  min-height: 18px; transition: opacity 0.3s;
+}
+.msg-ok { color: #5DCAA5; }
+.msg-err { color: #ff7675; }
+
+/* 토글 */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid #3d2516; }
+.toggle-row:last-child { border: none; }
+.toggle-label { font-size: 12px; color: #f5e6d3; }
+.toggle { width: 38px; height: 21px; border-radius: 11px; background: #3d2516; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+.toggle.on { background: #c8421a; }
+.toggle-knob { width: 17px; height: 17px; background: #f5e6d3; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left 0.2s; }
+.toggle.on .toggle-knob { left: 19px; }
+
+/* 노션 연결 상태 */
+.notion-status {
+  display: flex; align-items: center; gap: 8px;
+  background: #1a0e05; border: 0.5px solid #4a2c1a;
+  border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok { background: #5DCAA5; }
+.dot-err { background: #ff7675; }
+.dot-wait { background: #EF9F27; }
+.status-text { font-size: 11px; color: #a07050; flex: 1; }
+.status-text strong { color: #f5e6d3; }
+
+/* 주문 리스트 */
+.order-item {
+  background: #1a0e05; border: 0.5px solid #3d2516; border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 7px;
+}
+.order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+.order-name { font-size: 12px; font-weight: 600; color: #f5e6d3; }
+.order-time { font-size: 10px; color: #5a3e28; }
+.order-detail { font-size: 11px; color: #8b5e3c; line-height: 1.5; }
+.order-amount { font-size: 13px; font-weight: 600; color: #c8421a; margin-top: 4px; }
+.pill { font-size: 9px; padding: 2px 7px; border-radius: 8px; font-weight: 600; display: inline-block; }
+.pill-wait { background: #3d2a00; color: #EF9F27; }
+.pill-ok { background: #0a2e1f; color: #5DCAA5; }
+
+/* 탭 패널 */
+.panel { display: none; }
+.panel.act { display: block; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- 헤더 -->
+  <div class="admin-header">
+    <div class="admin-brand">한별농원 <span>ADMIN</span></div>
+    <div class="header-btns">
+      <button class="hbtn" onclick="goHome()">🏠 홈</button>
+      <button class="hbtn hbtn-red" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- 탭 -->
+  <div class="tabs">
+    <div class="tab act" id="tab-price" onclick="switchTab('price')">💰 가격관리</div>
+    <div class="tab" id="tab-variety" onclick="switchTab('variety')">🍎 품종관리</div>
+    <div class="tab" id="tab-story" onclick="switchTab('story')">📖 이야기쓰기</div>
+    <div class="tab" id="tab-orders" onclick="switchTab('orders')">📋 주문확인</div>
+  </div>
+
+  <!-- ① 가격 관리 -->
+  <div class="panel act" id="panel-price">
+    <div class="section">
+      <div class="sec-title">🍎 홍로 가격</div>
+      <div class="card">
+        <div class="row-3">
+          <div>
+            <label>선물용 (15과이내)</label>
+            <input type="number" id="p-hongro-gift-10" value="72000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">10kg</label>
+          </div>
+          <div>
+            <label>가정용 (16~20과)</label>
+            <input type="number" id="p-hongro-home-10" value="65000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">10kg</label>
+          </div>
+          <div>
+            <label>실속형 (흠과)</label>
+            <input type="number" id="p-hongro-bulk-10" value="58000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">10kg</label>
+          </div>
+        </div>
+        <div class="row-3" style="margin-top:10px;">
+          <div>
+            <input type="number" id="p-hongro-gift-5" value="38000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">5kg 선물용</label>
+          </div>
+          <div>
+            <input type="number" id="p-hongro-home-5" value="32000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">5kg 가정용</label>
+          </div>
+          <div>
+            <input type="number" id="p-hongro-bulk-5" value="28000" />
+            <label style="margin-top:4px;font-size:9px;color:#5a3e28;">5kg 실속형</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-title">🍎 감홍 가격</div>
+      <div class="card">
+        <div class="row-3">
+          <div><label>선물용</label><input type="number" id="p-gamhong-gift-10" value="80000" /></div>
+          <div><label>가정용</label><input type="number" id="p-gamhong-home-10" value="72000" /></div>
+          <div><label>실속형</label><input type="number" id="p-gamhong-bulk-10" value="64000" /></div>
+        </div>
+        <div class="row-3" style="margin-top:10px;">
+          <div><input type="number" id="p-gamhong-gift-5" value="42000" /><label style="font-size:9px;color:#5a3e28;">5kg 선물용</label></div>
+          <div><input type="number" id="p-gamhong-home-5" value="35000" /><label style="font-size:9px;color:#5a3e28;">5kg 가정용</label></div>
+          <div><input type="number" id="p-gamhong-bulk-5" value="30000" /><label style="font-size:9px;color:#5a3e28;">5kg 실속형</label></div>
+        </div>
+      </div>
+
+      <div class="sec-title">🍏 부사(후지) 가격</div>
+      <div class="card">
+        <div class="row-3">
+          <div><label>선물용</label><input type="number" id="p-busa-gift-10" value="68000" /></div>
+          <div><label>가정용</label><input type="number" id="p-busa-home-10" value="60000" /></div>
+          <div><label>실속형</label><input type="number" id="p-busa-bulk-10" value="54000" /></div>
+        </div>
+        <div class="row-3" style="margin-top:10px;">
+          <div><input type="number" id="p-busa-gift-5" value="36000" /><label style="font-size:9px;color:#5a3e28;">5kg 선물용</label></div>
+          <div><input type="number" id="p-busa-home-5" value="30000" /><label style="font-size:9px;color:#5a3e28;">5kg 가정용</label></div>
+          <div><input type="number" id="p-busa-bulk-5" value="26000" /><label style="font-size:9px;color:#5a3e28;">5kg 실속형</label></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>배송비 (원)</label>
+        <input type="number" id="ship-fee" value="5000" />
+        <div style="font-size:10px;color:#5a3e28;margin-top:5px;">※ 고객 화면에 '+ 배송비 5,000원 별도'로 표시됩니다</div>
+      </div>
+
+      <button class="btn btn-save" onclick="savePrices()">💾 가격 저장 및 고객화면 반영</button>
+      <div class="status-msg msg-ok" id="price-msg"></div>
+    </div>
+  </div>
+
+  <!-- ② 품종 관리 -->
+  <div class="panel" id="panel-variety">
+    <div class="section">
+      <div class="sec-title">판매 중인 품종 ON/OFF</div>
+      <div class="card">
+        <div style="font-size:10px;color:#5a3e28;margin-bottom:10px;">OFF 하면 고객 화면에서 즉시 사라집니다</div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">🍎 홍로</div>
+            <div style="font-size:10px;color:#5a3e28;">9월 수확 · 새콤달콤</div>
+          </div>
+          <div class="toggle on" id="tog-hongro" onclick="toggleVar('hongro')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">🍎 감홍</div>
+            <div style="font-size:10px;color:#5a3e28;">10~11월 수확 · 고당도</div>
+          </div>
+          <div class="toggle on" id="tog-gamhong" onclick="toggleVar('gamhong')"><div class="toggle-knob"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">🍏 부사(후지)</div>
+            <div style="font-size:10px;color:#5a3e28;">11월 수확 · 아삭</div>
+          </div>
+          <div class="toggle on" id="tog-busa" onclick="toggleVar('busa')"><div class="toggle-knob"></div></div>
+        </div>
+      </div>
+      <div class="status-msg msg-ok" id="var-msg"></div>
+
+      <div class="sec-title" style="margin-top:4px;">계좌 정보 설정</div>
+      <div class="card">
+        <label>은행명</label><input type="text" id="acct-bank" value="농협은행" />
+        <label>계좌번호</label><input type="text" id="acct-num" value="351-0123-4567-83" />
+        <label>예금주</label><input type="text" id="acct-holder" value="한별농원 (김○○)" />
+        <button class="btn btn-save" onclick="saveAcct()">계좌 저장</button>
+        <div class="status-msg msg-ok" id="acct-msg"></div>
+      </div>
+
+      <div class="sec-title" style="margin-top:4px;">농원 연락처</div>
+      <div class="card">
+        <label>전화번호</label><input type="text" id="farm-phone" value="010-0000-0000" />
+        <label>주소</label><input type="text" id="farm-addr" value="충북 괴산군 장연면 충민로방곡2길 36" />
+        <button class="btn btn-save" onclick="saveFarm()">정보 저장</button>
+        <div class="status-msg msg-ok" id="farm-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 사과 이야기 쓰기 (노션 연동) -->
+  <div class="panel" id="panel-story">
+    <div class="section">
+
+      <!-- 노션 API 키 설정 -->
+      <div class="sec-title">🔑 노션 API 연결</div>
+      <div class="card">
+        <div class="notion-status" id="notion-status-bar">
+          <div class="status-dot dot-wait" id="notion-dot"></div>
+          <div class="status-text" id="notion-status-text">API 키를 입력하고 연결 테스트를 해주세요</div>
+        </div>
+        <label>노션 API 시크릿 키</label>
+        <input type="password" id="notion-token" placeholder="secret_xxxxxxxxxxxxxxxx" />
+        <div style="font-size:10px;color:#5a3e28;margin-top:5px;line-height:1.6;">
+          notion.so → Settings → Connections → Develop or manage integrations → New integration에서 발급
+        </div>
+        <button class="btn btn-outline" onclick="testNotion()">🔗 연결 테스트</button>
+        <div class="status-msg" id="notion-test-msg"></div>
+      </div>
+
+      <!-- 사과이야기 DB ID -->
+      <div class="card">
+        <label>사과이야기 DB ID</label>
+        <input type="text" id="story-db-id" value="192a50bb50de4295adbf625ad498e22c" />
+        <div style="font-size:10px;color:#5a3e28;margin-top:4px;">🌸 한별농원 사과 이야기 데이터베이스</div>
+      </div>
+
+      <!-- 글쓰기 -->
+      <div class="sec-title" style="margin-top:4px;">📖 새 소식 작성</div>
+      <div class="card">
+        <label>카테고리</label>
+        <select id="story-category">
+          <option value="농원 소식">🌸 농원 소식</option>
+          <option value="체험 행사">🌿 체험 행사</option>
+          <option value="출하 소식">📦 출하 소식</option>
+          <option value="재배 이야기">🌱 재배 이야기</option>
+          <option value="기타">기타</option>
+        </select>
+        <label>제목</label>
+        <input type="text" id="story-title" placeholder="소식 제목을 입력하세요" />
+        <label>내용</label>
+        <textarea id="story-content" rows="6" placeholder="내용을 정성껏 작성해주세요..."></textarea>
+        <label>공개 여부</label>
+        <select id="story-public">
+          <option value="공개">공개</option>
+          <option value="비공개">비공개</option>
+        </select>
+        <button class="btn btn-notion" onclick="sendStory()">📤 노션에 게시하기</button>
+        <div class="status-msg" id="story-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 주문 확인 -->
+  <div class="panel" id="panel-orders">
+    <div class="section">
+      <div class="sec-title">📋 최근 주문</div>
+
+      <div class="notion-status" style="margin-bottom:12px;">
+        <div class="status-dot dot-wait" id="orders-dot"></div>
+        <div class="status-text" id="orders-status">노션에서 주문 목록을 불러오려면 API 키가 필요합니다</div>
+      </div>
+
+      <button class="btn btn-save" style="margin-top:0;margin-bottom:12px;" onclick="loadOrders()">🔄 주문 목록 새로고침</button>
+
+      <div id="orders-list">
+        <!-- 샘플 주문 표시 -->
+        <div class="order-item">
+          <div class="order-top">
+            <div class="order-name">김민준</div>
+            <div class="order-time">방금 전</div>
+          </div>
+          <div class="order-detail">홍로 10kg 선물용(15과이내) × 1<br>서울시 마포구 합정동 123-4</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;">
+            <div class="order-amount">72,000원 + 배송비 5,000원</div>
+            <span class="pill pill-wait">입금대기</span>
+          </div>
+        </div>
+        <div class="order-item">
+          <div class="order-top">
+            <div class="order-name">이수진</div>
+            <div class="order-time">1시간 전</div>
+          </div>
+          <div class="order-detail">감홍 5kg 가정용(16~20과) × 2<br>경기도 성남시 분당구</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;">
+            <div class="order-amount">70,000원 + 배송비 5,000원</div>
+            <span class="pill pill-ok">입금확인</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <a href="https://www.notion.so/e90fe608320147fa95b4e245d95bee0e" target="_blank">
+          <button class="btn btn-notion" style="margin-top:0;">📊 노션에서 전체 주문 보기 →</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── 인증 확인 ── */
+if (sessionStorage.getItem('hb_admin_auth') !== 'true') {
+  location.href = 'login.html';
+}
+
+/* ── 탭 전환 ── */
+function switchTab(tab) {
+  ['price','variety','story','orders'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('act', t===tab);
+    document.getElementById('panel-'+t).classList.toggle('act', t===tab);
+  });
+}
+
+/* ── 로그아웃 ── */
+function doLogout() {
+  sessionStorage.removeItem('hb_admin_auth');
+  location.href = 'login.html';
+}
+
+function goHome() { location.href = 'index.html'; }
+
+/* ── 가격 저장 ── */
+function savePrices() {
+  const prices = {
+    hongro: {
+      '10kg-선물용(15과이내)': +document.getElementById('p-hongro-gift-10').value,
+      '10kg-가정용(16~20과)': +document.getElementById('p-hongro-home-10').value,
+      '10kg-실속형(흠과)':     +document.getElementById('p-hongro-bulk-10').value,
+      '5kg-선물용(15과이내)':  +document.getElementById('p-hongro-gift-5').value,
+      '5kg-가정용(16~20과)':   +document.getElementById('p-hongro-home-5').value,
+      '5kg-실속형(흠과)':      +document.getElementById('p-hongro-bulk-5').value,
+    },
+    gamhong: {
+      '10kg-선물용(15과이내)': +document.getElementById('p-gamhong-gift-10').value,
+      '10kg-가정용(16~20과)': +document.getElementById('p-gamhong-home-10').value,
+      '10kg-실속형(흠과)':     +document.getElementById('p-gamhong-bulk-10').value,
+      '5kg-선물용(15과이내)':  +document.getElementById('p-gamhong-gift-5').value,
+      '5kg-가정용(16~20과)':   +document.getElementById('p-gamhong-home-5').value,
+      '5kg-실속형(흠과)':      +document.getElementById('p-gamhong-bulk-5').value,
+    },
+    busa: {
+      '10kg-선물용(15과이내)': +document.getElementById('p-busa-gift-10').value,
+      '10kg-가정용(16~20과)': +document.getElementById('p-busa-home-10').value,
+      '10kg-실속형(흠과)':     +document.getElementById('p-busa-bulk-10').value,
+      '5kg-선물용(15과이내)':  +document.getElementById('p-busa-gift-5').value,
+      '5kg-가정용(16~20과)':   +document.getElementById('p-busa-home-5').value,
+      '5kg-실속형(흠과)':      +document.getElementById('p-busa-bulk-5').value,
+    }
+  };
+  const shipFee = +document.getElementById('ship-fee').value || 5000;
+  localStorage.setItem('hb_prices', JSON.stringify(prices));
+  localStorage.setItem('hb_ship_fee', shipFee);
+  showMsg('price-msg', '✓ 가격이 저장되었습니다. 고객 화면에 반영됩니다!', 'ok');
+}
+
+/* ── 계좌 저장 ── */
+function saveAcct() {
+  localStorage.setItem('hb_bank', document.getElementById('acct-bank').value);
+  localStorage.setItem('hb_account', document.getElementById('acct-num').value);
+  localStorage.setItem('hb_holder', document.getElementById('acct-holder').value);
+  showMsg('acct-msg', '✓ 계좌 정보가 저장되었습니다', 'ok');
+}
+
+/* ── 농원 정보 저장 ── */
+function saveFarm() {
+  localStorage.setItem('hb_phone', document.getElementById('farm-phone').value);
+  localStorage.setItem('hb_addr', document.getElementById('farm-addr').value);
+  showMsg('farm-msg', '✓ 농원 정보가 저장되었습니다', 'ok');
+}
+
+/* ── 품종 토글 ── */
+function toggleVar(k) {
+  const tog = document.getElementById('tog-'+k);
+  const isOn = tog.classList.toggle('on');
+  const vars = JSON.parse(localStorage.getItem('hb_variety') || '{"hongro":true,"gamhong":true,"busa":true}');
+  vars[k] = isOn;
+  localStorage.setItem('hb_variety', JSON.stringify(vars));
+  const names = {hongro:'홍로', gamhong:'감홍', busa:'부사(후지)'};
+  showMsg('var-msg', `✓ ${names[k]} ${isOn ? 'ON — 고객 화면에 표시됩니다' : 'OFF — 고객 화면에서 숨겨집니다'}`, 'ok');
+}
+
+/* ── 노션 연결 테스트 ── */
+async function testNotion() {
+  const token = document.getElementById('notion-token').value.trim();
+  if (!token) { showMsg('notion-test-msg', '⚠ API 키를 입력해주세요', 'err'); return; }
+  showMsg('notion-test-msg', '연결 테스트 중...', 'ok');
+  try {
+    const res = await fetch('https://api.notion.com/v1/users/me', {
+      headers: { 'Authorization': 'Bearer ' + token, 'Notion-Version': '2022-06-28' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('hb_notion_token', token);
+      document.getElementById('notion-dot').className = 'status-dot dot-ok';
+      document.getElementById('notion-status-text').innerHTML = `<strong>연결됨</strong> — ${data.name || '인증 완료'}`;
+      showMsg('notion-test-msg', '✓ 노션 API 연결 성공! 키가 저장되었습니다', 'ok');
+    } else {
+      document.getElementById('notion-dot').className = 'status-dot dot-err';
+      document.getElementById('notion-status-text').innerHTML = '<strong>연결 실패</strong> — 키를 다시 확인해주세요';
+      showMsg('notion-test-msg', '✗ 연결 실패. API 키를 확인해주세요', 'err');
+    }
+  } catch(e) {
+    showMsg('notion-test-msg', '✗ 통신 오류. CORS 제한으로 브라우저에서 직접 호출이 안 될 수 있습니다', 'err');
+  }
+}
+
+/* ── 사과이야기 노션 전송 ── */
+async function sendStory() {
+  const token = localStorage.getItem('hb_notion_token') || document.getElementById('notion-token').value.trim();
+  const dbId = document.getElementById('story-db-id').value.trim().replace(/-/g, '');
+  const title = document.getElementById('story-title').value.trim();
+  const content = document.getElementById('story-content').value.trim();
+  const category = document.getElementById('story-category').value;
+  const pubStatus = document.getElementById('story-public').value;
+
+  if (!token) { showMsg('story-msg', '⚠ 노션 API 키를 먼저 입력해주세요', 'err'); return; }
+  if (!title || !content) { showMsg('story-msg', '⚠ 제목과 내용을 입력해주세요', 'err'); return; }
+
+  showMsg('story-msg', '노션에 전송 중...', 'ok');
+
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        parent: { database_id: dbId },
+        icon: { type: 'emoji', emoji: category === '농원 소식' ? '🌸' : category === '체험 행사' ? '🌿' : category === '출하 소식' ? '📦' : '🌱' },
+        properties: {
+          '제목': { title: [{ text: { content: title } }] },
+          '카테고리': { select: { name: category } },
+          '내용 요약': { rich_text: [{ text: { content: content } }] },
+          '공개 여부': { select: { name: pubStatus } },
+          '작성자': { rich_text: [{ text: { content: '한별농원' } }] },
+          'date:작성일:start': undefined
+        }
+      })
+    });
+
+    if (res.ok) {
+      showMsg('story-msg', '✓ 노션에 성공적으로 게시되었습니다!', 'ok');
+      document.getElementById('story-title').value = '';
+      document.getElementById('story-content').value = '';
+    } else {
+      const err = await res.json();
+      showMsg('story-msg', '✗ 전송 실패: ' + (err.message || '키/DB ID를 확인해주세요'), 'err');
+    }
+  } catch(e) {
+    showMsg('story-msg', '✗ 통신 오류. CORS 문제일 수 있습니다', 'err');
+  }
+}
+
+/* ── 주문 목록 로드 ── */
+async function loadOrders() {
+  const token = localStorage.getItem('hb_notion_token');
+  if (!token) {
+    document.getElementById('orders-status').innerHTML = '⚠ 먼저 사과이야기 탭에서 API 키를 입력해주세요';
+    return;
+  }
+  document.getElementById('orders-status').textContent = '주문 목록 불러오는 중...';
+  try {
+    const res = await fetch('https://api.notion.com/v1/databases/e90fe608320147fa95b4e245d95bee0e/query', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({ sorts: [{ timestamp: 'created_time', direction: 'descending' }], page_size: 10 })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('orders-dot').className = 'status-dot dot-ok';
+      document.getElementById('orders-status').innerHTML = `<strong>연결됨</strong> — 최근 ${data.results.length}건`;
+      renderOrders(data.results);
+    } else {
+      document.getElementById('orders-dot').className = 'status-dot dot-err';
+      document.getElementById('orders-status').textContent = '불러오기 실패. API 키와 DB 공유 설정을 확인해주세요';
+    }
+  } catch(e) {
+    document.getElementById('orders-status').textContent = '통신 오류가 발생했습니다';
+  }
+}
+
+function renderOrders(pages) {
+  const list = document.getElementById('orders-list');
+  if (!pages.length) { list.innerHTML = '<div style="text-align:center;color:#5a3e28;font-size:12px;padding:20px;">주문이 없습니다</div>'; return; }
+  list.innerHTML = pages.map(p => {
+    const props = p.properties;
+    const name = props['주문자명']?.rich_text?.[0]?.text?.content || '(이름없음)';
+    const item = props['주문명']?.title?.[0]?.text?.content || '';
+    const amt = props['결제금액']?.number ? (props['결제금액'].number).toLocaleString('ko-KR') + '원' : '-';
+    const status = props['입금여부']?.select?.name || '확인필요';
+    const addr = props['배송주소']?.rich_text?.[0]?.text?.content || '';
+    const isPaid = status === '입금확인';
+    return `<div class="order-item">
+      <div class="order-top"><div class="order-name">${name}</div></div>
+      <div class="order-detail">${item}<br>${addr}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;">
+        <div class="order-amount">${amt}</div>
+        <span class="pill ${isPaid ? 'pill-ok' : 'pill-wait'}">${status}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── 유틸 ── */
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'status-msg msg-' + type;
+  if (text && type === 'ok') setTimeout(() => { if(el.textContent === text) el.textContent = ''; }, 3000);
+}
+
+/* ── 저장된 값 복원 ── */
+window.addEventListener('load', () => {
+  const savedToken = localStorage.getItem('hb_notion_token');
+  if (savedToken) {
+    document.getElementById('notion-token').value = savedToken;
+    document.getElementById('notion-dot').className = 'status-dot dot-ok';
+    document.getElementById('notion-status-text').innerHTML = '<strong>연결됨</strong> — 저장된 키 사용 중';
+  }
+  const savedBank = localStorage.getItem('hb_bank');
+  if (savedBank) document.getElementById('acct-bank').value = savedBank;
+  const savedAcct = localStorage.getItem('hb_account');
+  if (savedAcct) document.getElementById('acct-num').value = savedAcct;
+  const savedHolder = localStorage.getItem('hb_holder');
+  if (savedHolder) document.getElementById('acct-holder').value = savedHolder;
+  const savedPhone = localStorage.getItem('hb_phone');
+  if (savedPhone) document.getElementById('farm-phone').value = savedPhone;
+  const savedAddr = localStorage.getItem('hb_addr');
+  if (savedAddr) document.getElementById('farm-addr').value = savedAddr;
+  const savedVars = localStorage.getItem('hb_variety');
+  if (savedVars) {
+    const v = JSON.parse(savedVars);
+    ['hongro','gamhong','busa'].forEach(k => {
+      document.getElementById('tog-'+k).classList.toggle('on', !!v[k]);
+    });
+  }
+});
+</script>
+</body>
+</html>
