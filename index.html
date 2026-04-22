@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한별농원 — 2026 햇사과 산지직송</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#fdf8f2; --warm:#fff9f4; --brown:#2c1e0f; --brown-m:#5a3e28;
+  --brown-l:#a07050; --brown-p:#e8d5c0; --red:#c8421a; --red-d:#a83210;
+  --red-p:#fff0e8; --red-b:#f0c0a0; --green:#1D9E75; --green-p:#eaf3de;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:#ede4d8;color:var(--brown);-webkit-tap-highlight-color:transparent;}
+
+#app { display: flex; flex-direction: column; min-height: 100vh; max-width: 500px; margin: 0 auto; background: var(--warm); box-shadow: 0 0 30px rgba(0,0,0,0.05); }
+
+header { padding: 40px 20px 20px; text-align: center; }
+.logo-area { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 26px; letter-spacing: -0.5px; color: var(--brown); margin-bottom: 4px; }
+.sub-tag { font-size: 13px; color: var(--brown-l); font-weight: 400; letter-spacing: 2px; }
+
+.notice-box { margin: 10px 20px 24px; padding: 18px; background: var(--red-p); border-radius: 12px; border-left: 4px solid var(--red); }
+.notice-label { font-size: 11px; font-weight: 700; color: var(--red); margin-bottom: 6px; display: block; }
+.notice-text { font-size: 14.5px; line-height: 1.6; color: var(--brown); font-weight: 500; word-break: keep-all; }
+
+.product-card { margin: 0 20px 16px; background: white; border-radius: 16px; padding: 24px; border: 1px solid #eee; transition: 0.2s; }
+.item-name { font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--brown); }
+.item-price { font-size: 17px; font-weight: 600; color: var(--red); margin-bottom: 12px; }
+.item-desc { font-size: 13.5px; color: var(--brown-m); line-height: 1.5; margin-bottom: 18px; }
+.order-btn { width: 100%; padding: 14px; background: var(--brown); color: white; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; }
+
+.info-section { margin-top: auto; padding: 40px 20px; background: #f9f4ee; font-size: 13.5px; color: var(--brown-m); }
+.info-title { font-weight: 700; margin-bottom: 12px; color: var(--brown); font-size: 14px; border-left: 3px solid var(--brown-l); padding-left: 8px; }
+.info-item { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+.account-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid #e0d0c0; margin-top: 5px; cursor: pointer; transition: 0.2s; position: relative; }
+.account-box:active { background: #fdf8f2; transform: scale(0.98); }
+.copy-label { font-size: 10px; color: var(--brown-l); font-weight: 600; position: absolute; right: 15px; top: 15px; }
+
+#footer-admin { padding: 35px 20px; text-align: center; background: #f9f4ee; border-top: 1px solid #ede4d8; cursor: pointer; }
+.footer-copy { font-size: 11px; color: #a08c7d; line-height: 1.8; }
+#footer-gear { font-size: 14px; opacity: 0.1; display: inline-block; margin-top: 10px; }
+
+#toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(44, 30, 15, 0.9); color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000; }
+#toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <div class="logo-area">한별농원</div>
+    <div class="sub-tag">HANBYEOL APPLE FARM</div>
+  </header>
+
+  <div class="notice-box">
+    <span class="notice-label">농장 소식</span>
+    <div class="notice-text" id="main-notice">올해에도 정성껏 키운 한별농원 햇사과를 만나보세요.</div>
+  </div>
+
+  <div id="product-list">
+    <!-- 상품이 여기에 표시됩니다 -->
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">주문 및 문의</div>
+    <div class="info-item"><span>대표 연락처</span> <span id="display-phone">010-0000-0000</span></div>
+    <div class="info-item"><span>농장 위치</span> <span id="display-addr">충북 괴산군 장연면 방곡리</span></div>
+    
+    <div style="height:25px"></div>
+    
+    <div class="info-title">입금 계좌 안내</div>
+    <div class="account-box" onclick="copyAccount()">
+      <div id="display-bank" style="font-weight:600;">농협 000-00-00000 (한별농원)</div>
+      <div class="copy-label">계좌 복사</div>
+    </div>
+  </div>
+
+  <div id="footer-admin" onclick="handleFooterClick()">
+    <div class="footer-copy">
+      © 2026 한별농원 · All Rights Reserved<br>
+      <span id="footer-gear">⚙</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast">계좌번호가 복사되었습니다.</div>
+
+<script>
+let footerClickCount = 0;
+let footerTimer = null;
+
+function syncAdminSettings() {
+  const bank = localStorage.getItem('hb_bank') || "농협";
+  const acct = localStorage.getItem('hb_account') || "000-00-00000";
+  const holder = localStorage.getItem('hb_holder') || "한별농원";
+  const phone = localStorage.getItem('hb_phone') || "010-0000-0000";
+  const addr = localStorage.getItem('hb_addr') || "충북 괴산군 장연면 방곡리";
+  const notice = localStorage.getItem('hb_notice') || "올해에도 정성껏 키운 한별농원 햇사과를 만나보세요.";
+
+  document.getElementById('display-bank').textContent = `${bank} ${acct} (${holder})`;
+  document.getElementById('display-phone').textContent = phone;
+  document.getElementById('display-addr').textContent = addr;
+  document.getElementById('main-notice').textContent = notice;
+}
+
+function renderProducts() {
+  const container = document.getElementById('product-list');
+  const vars = JSON.parse(localStorage.getItem('hb_variety') || '[]');
+  
+  if(vars.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:60px 20px; color:#999; font-size:14px; font-style:italic;">준비 중인 상품입니다. 잠시만 기다려주세요.</div>';
+    return;
+  }
+
+  container.innerHTML = vars.map(v => `
+    <div class="product-card">
+      <div class="item-name">${v.name}</div>
+      <div class="item-price">${v.price}</div>
+      <div class="item-desc">${v.desc}</div>
+      <button class="order-btn" onclick="alert('전화(${localStorage.getItem('hb_phone') || '010-0000-0000'})로 문의주시면 빠른 주문이 가능합니다.')">주문 문의하기</button>
+    </div>
+  `).join('');
+}
+
+function handleFooterClick() {
+  footerClickCount++;
+  document.getElementById('footer-gear').style.opacity = footerClickCount * 0.15;
+  
+  clearTimeout(footerTimer);
+  footerTimer = setTimeout(() => { 
+    footerClickCount = 0; 
+    document.getElementById('footer-gear').style.opacity = 0.1; 
+  }, 2000);
+
+  if (footerClickCount >= 7) {
+    location.href = './login.html'; // 상대 경로 유지
+  }
+}
+
+function copyAccount() {
+  const text = document.getElementById('display-bank').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+window.onload = () => {
+  syncAdminSettings();
+  renderProducts();
+};
+</script>
+</body>
+</html>
