@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한별농원 관리 시스템 (Private)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1a0e05; color: #f5e6d3; font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; }
+.shell { max-width: 500px; margin: 0 auto; padding: 0 0 40px; }
+
+/* 헤더 */
+.admin-header {
+  background: #25160d;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid #4a2c1a;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.admin-brand { font-family: 'Noto Serif KR', serif; font-size: 15px; font-weight: 700; color: #f5e6d3; }
+
+/* 버튼 공통 */
+.hbtn {
+  border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+  padding: 8px 14px; cursor: pointer; transition: 0.2s;
+}
+.hbtn-brown { background: #4a2c1a; color: #f5e6d3; }
+.hbtn-brown:hover { background: #5d3a24; }
+.hbtn-red { background: #6b2112; color: #f5e6d3; }
+
+/* 섹션 스타일 */
+.section { background: #25160d; margin: 16px; padding: 20px; border-radius: 16px; border: 0.5px solid #3d2516; }
+.section-title { font-family: 'Noto Serif KR', serif; font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.section-title span { font-size: 18px; }
+
+/* 입력창 스타일 */
+.field-group { margin-bottom: 16px; }
+.label { display: block; font-size: 11px; color: #a08a78; margin-bottom: 6px; font-weight: 500; }
+input[type="text"], input[type="password"], textarea {
+  width: 100%; background: #1a0e05; border: 1px solid #4a2c1a; border-radius: 10px;
+  padding: 12px; color: #f5e6d3; font-size: 14px; outline: none; transition: 0.2s;
+}
+input:focus { border-color: #8b5e3c; }
+
+/* 노션 연결 상태 */
+.status-box { background: #1a0e05; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4a2c1a; }
+.dot-ok { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+.status-text { font-size: 12px; color: #a08a78; }
+
+/* 품종 스위치 */
+.variety-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #1a0e05; padding: 12px 16px; border-radius: 12px; margin-bottom: 8px;
+}
+.v-info { display: flex; flex-direction: column; }
+.v-name { font-size: 14px; font-weight: 600; }
+.v-price { font-size: 12px; color: #a08a78; margin-top: 2px; }
+
+/* 토글 스위치 */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #3d2516; transition: .3s; border-radius: 24px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background-color: #f5e6d3; transition: .3s; border-radius: 50%;
+}
+input:checked + .slider { background-color: #8b5e3c; }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* 메시지 */
+.status-msg { font-size: 11px; margin-top: 8px; height: 16px; }
+.msg-ok { color: #2ecc71; }
+.msg-err { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="admin-header">
+    <div class="admin-brand">한별농원 관리 시스템</div>
+    <div class="header-right">
+      </div>
+  </header>
+
+  <section class="section">
+    <div class="section-title"><span>🔗</span> 노션 API 연동</div>
+    <div class="status-box">
+      <div id="notion-dot" class="status-dot"></div>
+      <div id="notion-status-text" class="status-text">연결 정보 없음</div>
+    </div>
+    <div class="field-group">
+      <label class="label">Notion Internal Integration Token</label>
+      <input type="password" id="notion-token" placeholder="secret_..." />
+    </div>
+    <button class="hbtn hbtn-brown" style="width:100%" onclick="saveNotionKey()">연결 정보 저장</button>
+    <div id="notion-msg" class="status-msg"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>🏡</span> 농원 기본 정보</div>
+    <div class="field-group">
+      <label class="label">입금 은행명</label>
+      <input type="text" id="acct-bank" placeholder="예: 농협" />
+    </div>
+    <div class="field-group">
+      <label class="label">계좌 번호</label>
+      <input type="text" id="acct-num" placeholder="000-0000-0000-00" />
+    </div>
+    <div class="field-group">
+      <label class="label">예금주</label>
+      <input type="text" id="acct-holder" placeholder="홍길동" />
+    </div>
+    <div class="field-group">
+      <label class="label">대표 연락처</label>
+      <input type="text" id="farm-phone" placeholder="010-0000-0000" />
+    </div>
+    <div class="field-group">
+      <label class="label">농원 주소</label>
+      <input type="text" id="farm-addr" placeholder="주소를 입력하세요" />
+    </div>
+    <button class="hbtn hbtn-brown" style="width:100%" onclick="saveBasicInfo()">정보 업데이트</button>
+    <div id="basic-msg" class="status-msg"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span>🍎</span> 품종 및 재고 관리</div>
+    <div id="variety-list">
+      </div>
+    <button class="hbtn hbtn-brown" style="width:100%; margin-top:10px;" onclick="saveVarietySettings()">판매 상태 저장</button>
+    <div id="variety-msg" class="status-msg"></div>
+  </section>
+</div>
+
+<script>
+/* 주의: 이 페이지는 파일명을 복잡하게 하여 접근을 제한하는 방식입니다.
+  로컬 스토리지 정보는 브라우저에 저장되므로 개인 기기에서만 사용하세요.
+*/
+
+const defaultVarieties = [
+  { id: 'v1', name: '시나노 골드 (노란사과)', price: '55,000원부터', soldout: false },
+  { id: 'v2', name: '감홍 (명품사과)', price: '시가', soldout: true },
+  { id: 'v3', name: '부사 (꿀사과)', price: '45,000원부터', soldout: false }
+];
+
+/* ── 노션 키 저장 ── */
+function saveNotionKey() {
+  const token = document.getElementById('notion-token').value.trim();
+  if(!token) {
+    setStatusMsg('notion-msg', '토큰을 입력해주세요', 'err');
+    return;
+  }
+  localStorage.setItem('hb_notion_token', token);
+  document.getElementById('notion-dot').className = 'status-dot dot-ok';
+  document.getElementById('notion-status-text').innerHTML = '<strong>연결됨</strong> — 토큰 저장 완료';
+  setStatusMsg('notion-msg', '성공적으로 저장되었습니다', 'ok');
+}
+
+/* ── 기본 정보 저장 ── */
+function saveBasicInfo() {
+  localStorage.setItem('hb_bank', document.getElementById('acct-bank').value);
+  localStorage.setItem('hb_account', document.getElementById('acct-num').value);
+  localStorage.setItem('hb_holder', document.getElementById('acct-holder').value);
+  localStorage.setItem('hb_phone', document.getElementById('farm-phone').value);
+  localStorage.setItem('hb_addr', document.getElementById('farm-addr').value);
+  setStatusMsg('basic-msg', '기본 정보가 로컬에 저장되었습니다', 'ok');
+}
+
+/* ── 품종 리스트 렌더링 ── */
+function renderVarieties() {
+  const container = document.getElementById('variety-list');
+  const saved = localStorage.getItem('hb_variety');
+  const list = saved ? JSON.parse(saved) : defaultVarieties;
+
+  container.innerHTML = list.map(v => `
+    <div class="variety-item">
+      <div class="v-info">
+        <div class="v-name">${v.name}</div>
+        <div class="v-price">${v.price}</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="chk-${v.id}" ${v.soldout ? '' : 'checked'}>
+        <span class="slider"></span>
+      </label>
+    </div>
+  `).join('');
+}
+
+/* ── 품종 설정 저장 ── */
+function saveVarietySettings() {
+  const saved = localStorage.getItem('hb_variety');
+  const list = saved ? JSON.parse(saved) : defaultVarieties;
+  
+  const updated = list.map(v => ({
+    ...v,
+    soldout: !document.getElementById('chk-' + v.id).checked
+  }));
+  
+  localStorage.setItem('hb_variety', JSON.stringify(updated));
+  setStatusMsg('variety-msg', '판매 상태가 저장되었습니다', 'ok');
+}
+
+/* ── 공통 메시지 출력 ── */
+function setStatusMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'status-msg msg-' + type;
+  if (text && type === 'ok') setTimeout(() => { if(el.textContent === text) el.textContent = ''; }, 3000);
+}
+
+/* ── 초기 데이터 로드 ── */
+window.addEventListener('load', () => {
+  const savedToken = localStorage.getItem('hb_notion_token');
+  if (savedToken) {
+    document.getElementById('notion-token').value = savedToken;
+    document.getElementById('notion-dot').className = 'status-dot dot-ok';
+    document.getElementById('notion-status-text').innerHTML = '<strong>연결됨</strong> — 저장된 키 사용 중';
+  }
+  
+  document.getElementById('acct-bank').value = localStorage.getItem('hb_bank') || '';
+  document.getElementById('acct-num').value = localStorage.getItem('hb_account') || '';
+  document.getElementById('acct-holder').value = localStorage.getItem('hb_holder') || '';
+  document.getElementById('farm-phone').value = localStorage.getItem('hb_phone') || '';
+  document.getElementById('farm-addr').value = localStorage.getItem('hb_addr') || '';
+  
+  renderVarieties();
+});
+</script>
+
+</body>
+</html>
